@@ -1,0 +1,30 @@
+#!/bin/bash
+
+echo "Input max percent WITHOUT \"%\":"
+
+# Необходимо ввести максимально возиожный процент заполненности папки /LOG
+read MAXPCENT
+
+PCENT=$((`df -k /LOG | tail -1 | awk '{print $5}' | cut -d '%' -f 1`))
+
+# Проверка заполненности папки /LOG
+if [ $PCENT -gt $MAXPCENT ]
+
+then
+
+# Создание архива файлов папки /LOG
+tar -zcf LOG.tar.gz LOG
+
+# Перемещение архива в папку /BACKUP
+mv /LOG.tar.gz /BACKUP
+
+# Удаление всех, даже скрытых, файлов из папки /LOG
+rm -f /LOG/{*,.*}
+
+echo "Directory /LOG was overfilled. All the files were archivated and moved to /BACKUP. Now /LOG is empty."
+
+else
+
+echo "Use percent is $PCENT%, so it's OK."
+
+fi
