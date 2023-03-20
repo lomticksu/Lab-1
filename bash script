@@ -27,4 +27,20 @@ else
 
 echo "Use percent is $PCENT%, so it's OK."
 
-fi
+#ЧЕТВЕРТЫЙ ПУНКТ
+if [[ "$PCENT" -gt "$MAXPCENT" ]]
+then
+/LOG/
+
+list=$(ls -t | head -n 3)
+#cортируем по дате
+
+#кладем в архив
+tar -czvf /BACKUP/log4.tar.gz $list
+rm $list
+
+echo "Archived and deleted"
+else
+
+echo "not exceed the specified limit"
+ fi
