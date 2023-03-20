@@ -30,7 +30,7 @@ echo "Use percent is $PCENT%, so it's OK."
 #ЧЕТВЕРТЫЙ ПУНКТ
 if [[ "$PCENT" -gt "$MAXPCENT" ]]
 then
-/LOG/
+cd /LOG/
 
 list=$(ls -t | head -n 3)
 #cортируем по дате
