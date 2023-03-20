@@ -27,7 +27,7 @@ mv /LOG.tar.gz /BACKUP
 # Удаление этих файлов из папки /LOG
 rm $list
 
-echo "Directory /LOG was overfilled. Three old files were archivated and moved to /BACKUP. Now /LOG is empty."
+echo "Directory /LOG was overfilled. Three old files were archivated and moved to /BACKUP."
 
 else
 
