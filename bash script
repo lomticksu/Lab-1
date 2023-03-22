@@ -1,34 +1,83 @@
 #!/bin/bash
 
-echo "Input max percent WITHOUT \"%\":"
-
-# Необходимо ввести максимально возможный процент заполненности папки /LOG
-read MAXPCENT
-
-PCENT=$((`df -k /LOG | tail -1 | awk '{print $5}' | cut -d '%' -f 1`))
-
-# Проверка заполненности папки /LOG
-if [ $PCENT -gt $MAXPCENT ]
+# Проверка существования папки /LOG
+if [ -d "/LOG/" ]
 
 then
 
-# Заходим в папку /LOG
-cd /LOG/
+  # Проверка существования папки /BACKUP
+  if [ -d "/BACKUP/" ]
 
-# Создаём список файлов, отсортированный по дате, три самых старых файла
-list=$(ls -t | head -n 3)
+  then
 
-# Создание архива последних файлов папки /LOG
-tar -zvf LOG.tar.gz $list
+    echo "Input max percent WITHOUT \"%\":"
 
-# Перемещение архива в папку /BACKUP
-mv /LOG.tar.gz /BACKUP
+    # Необходимо ввести максимально возможный процент заполненности папки /LOG
+    read MAXPCENT
 
-# Удаление этих файлов из папки /LOG
-rm $list
+    # Реальный процент заполненности папки /LOG
+    PCENT=$((`df -k /LOG | tail -1 | awk '{print $5}' | cut -d '%' -f 1`))
 
-echo "Directory /LOG was overfilled. Three old files were archivated and moved to /BACKUP."
+    # Проверка заполненности папки /LOG
+    if [ $PCENT -gt $MAXPCENT ]
+
+    then
+
+      # Заходим в папку /LOG
+      cd /LOG
+
+      # Количество файлов в папке /LOG (вычитаем 2, т.к. столько у нас скрытых файлов)
+      COUNT=$((`ls -l | wc | awk '{print $1}'` - 2))
+
+      echo "Input max number of files:"
+
+      # Максимальное количество файлов
+      read N
+
+      # Проверка количества файлов в папке /LOG
+      if [ $COUNT -gt $N ]
+
+      then
+
+        # Создаём список последних N файлов
+        LIST=$(ls -t | head -n $N)
+
+      else
+
+        # Создаём список всех файлов, кроме скрытых
+        LIST=$(ls -t | head -n $COUNT)
+
+      fi
+
+      # Создание архива файлов папки /LOG
+      sudo tar -zcf LOG.tar.gz $LIST
+
+      # Перемещение архива в папку /BACKUP
+      sudo mv /LOG/LOG.tar.gz /BACKUP
+
+      cd /LOG
+
+      # Удаление файлов из папки /LOG
+      sudo rm $LIST
+
+      echo "/LOG is released."
+
+    else
+
+      echo "Use percent is $PCENT%, so it's OK."
+
+    fi
+
+  else
+
+    # Выдаёт ошибку, если папки /BACKUP не существует
+    echo "Error: /BACKUP/ doesn't exist."
+
+  fi
 
 else
 
-echo "Use percent is $PCENT%, so it's OK."
+  # Выдаёт ошибку, если папки /LOG не существует
+  echo "Error: /LOG/ doesn't exist."
+
+fi
